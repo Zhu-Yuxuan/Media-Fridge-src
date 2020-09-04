@@ -1,75 +1,64 @@
-#!/usr/bin/python
-# -*- coding: UTF-8 -*-
-
 from tkinter import *
-def say_hi():
-    print("hello ~ !")
-root = Tk()
-frame = Frame(root, height = 600, width = 1024)
-frame.pack()
-frame1 = Frame(frame, height= 300, width=341)
-frame2 = Frame(frame, height= 300, width=341)
-frame3 = Frame(frame, height= 300, width=341)
-frame4 = Frame(frame, height= 300, width=341)
-frame5 = Frame(frame, height= 300, width=341)
-frame6 = Frame(frame, height= 300, width=341)
-frame1.grid_propagate(0)
-frame2.grid_propagate(0)
-frame3.grid_propagate(0)
-frame4.grid_propagate(0)
-frame5.grid_propagate(0)
-frame6.grid_propagate(0)
+import threading
+import time
 
-root.title("tkinter frame")
+def detect():
+    global temp
+    while True:
+        temp -= 1
+        time.sleep(1)
+        print(temp)
+    # functions
 
-type1 = Label(frame1, text="类型：默认", width=47)
-temp1 = Label(frame1, text="温度：0°C")
-mois1 = Label(frame1, text="湿度：95%")
-type1.grid(row=1, column=1)
-temp1.grid(row=2, column=1)
-mois1.grid(row=3, column=1)
+def update(root):
+    root.update()
+    root.after(1000, update(root))
 
-type2 = Label(frame2, text="类型：默认", width=47)
-temp2 = Label(frame2, text="温度：0°C")
-mois2 = Label(frame2, text="湿度：95%")
-type2.grid(row=1, column=1)
-temp2.grid(row=2, column=1)
-mois2.grid(row=3, column=1)
+def gui():
+    global temp
+    root = Tk()
+    root.geometry("1024x600")
+    root.title("Frodge UI")
 
-type3 = Label(frame3, text="类型：默认", width=47)
-temp3 = Label(frame3, text="温度：0°C")
-mois3 = Label(frame3, text="湿度：95%")
-type3.grid(row=1, column=1)
-temp3.grid(row=2, column=1)
-mois3.grid(row=3, column=1)
+    framelist = []
+    content = [[], [], [], [], []]
+    # init list
+    for i in range(6):
+        framelist.append(Frame())
+        content[0].append([Label(), Label(), Label()])  # fix
+        content[1].append(Label())  # type
+        content[2].append(Label())  # tempture
+        content[3].append(Label())  # moisture
+        content[4].append([Label(), Label()])  # unit
+    # init frame
+    for i in range(6):
+        framelist[i] = Frame(root, height=300, width=341)
+        framelist[i].grid_propagate(0)
+        content[0][i][0] = Label(framelist[i], text="类型：")
+        content[0][i][1] = Label(framelist[i], text="温度：")
+        content[0][i][2] = Label(framelist[i], text="湿度：")
+        content[1][i] = Label(framelist[i], text=type)
+        content[2][i] = Label(framelist[i], text="0")
+        content[3][i] = Label(framelist[i], text=temp)
+        content[4][i][0] = Label(framelist[i], text="°C")
+        content[4][i][1] = Label(framelist[i], text="%")
+        content[0][i][0].grid(row=1, column=1)
+        content[0][i][1].grid(row=2, column=1)
+        content[0][i][2].grid(row=3, column=1)
+        content[1][i].grid(row=1, column=2)
+        content[2][i].grid(row=2, column=2)
+        content[3][i].grid(row=3, column=2)
+        content[4][i][0].grid(row=2, column=3)
+        content[4][i][1].grid(row=3, column=3)
+        framelist[i].grid(row=i // 3, column=i % 3)
 
-type4 = Label(frame4, text="类型：默认", width=47)
-temp4 = Label(frame4, text="温度：0°C")
-mois4 = Label(frame4, text="湿度：95%")
-type4.grid(row=1, column=1)
-temp4.grid(row=2, column=1)
-mois4.grid(row=3, column=1)
+    root.after(1000, update(root))
+    root.mainloop()
 
-type5 = Label(frame5, text="类型：默认", width=47)
-temp5 = Label(frame5, text="温度：0°C")
-mois5 = Label(frame5, text="湿度：95%")
-type5.grid(row=1, column=1)
-temp5.grid(row=2, column=1)
-mois5.grid(row=3, column=1)
-
-type6 = Label(frame6, text="类型：默认", width=47)
-temp6 = Label(frame6, text="温度：0°C")
-mois6 = Label(frame6, text="湿度：95%")
-type6.grid(row=1, column=1)
-temp6.grid(row=2, column=1)
-mois6.grid(row=3, column=1)
-
-frame1.grid(row=1, column=1)
-frame2.grid(row=1, column=2)
-frame3.grid(row=1, column=3)
-frame4.grid(row=2, column=1)
-frame5.grid(row=2, column=2)
-frame6.grid(row=2, column=3)
-frame1.update()
-print("frame size: ", frame1.winfo_width(), frame1.winfo_height())
-root.mainloop()
+if __name__ =='__main__':
+    global temp
+    temp = 95
+    t1 = threading.Thread(target=gui)
+    t2 = threading.Thread(target=detect)
+    t1.start()
+    t2.start()

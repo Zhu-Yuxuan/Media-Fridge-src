@@ -1,0 +1,5 @@
+fruit_list = ['fruit', 'apple', 'banana', 'orange', 'peach', 'pear', 'berry', 'pineapple', 'melon', 'radish', 'tomato', 'cucumber', 'pumpkin']
+vegetable_list = ['vegetable', 'mushroom', 'spinach', 'celery', 'caraway', 'lettuce', 'agaric', 'lotus root', 'water shield', 'arrowhead', 'cress']
+meat_list = ['meat', 'beef', 'pork', 'fish', 'egg', 'mutton', 'chicken', 'duck']
+drinking_list = ['drinking', 'milk', 'yogurt', 'coke', 'beer', 'vodka']
+food_database = [fruit_list, vegetable_list, meat_list, drinking_list]
