@@ -2,6 +2,8 @@ import threading
 from tkinter import *
 from tank import Tank
 from food import Food
+import serial
+import time
 # import RPi.GPIO as GPIO
 
 temp = [0, 0, 0, 0, 0, 0]
@@ -59,11 +61,43 @@ class GUI():
             self.framelist[i].grid(row=i // 3, column=i % 3)
         self.root.after(1000, self.Update)
         self.root.mainloop()
+def image_detect():
+    result_str = ""
+    ser = serial.Serial('/dev/ttyAMA0', 9600) # 9600为波特率，通信双方要保持一致
+    if ser.isOpen == False:
+        ser.open() # 打开串口
+    #ser.write(b"Raspberry pi is ready")
+    try:
+        while True:
+            size = ser.inWaiting()               # 获得缓冲区字符
+            if size != 0:
+                response = ser.read(size)        # 读取内容并显示
+                try:
+                    result_str = response.decode()
+                    if result_str[0] == '/':
+                        result_str = result_str[1:-4]
+                        # print(result_str)
+                        break
+                except:
+                    pass
+                ser.flushInput()                 # 清空接收缓存区
+                time.sleep(0.1)                  # 软件延时
+    except KeyboardInterrupt:
+        pass
+    ser.close()
+    return result_str
 def fridgeUI():
     root = Tk()
     fUI = GUI(root)
-def logic():
+def logic(fridge):
     global temp, mois, type
+    foodname = image_detect()
+    food = find_food(foodname)
+    if food.attribute == fridge[0].attribute or fridge[0].attribute == 'empty':
+        temp[0] = temperature_reco[food.num]
+        mois[0] = moisture_reco[food.num]
+        type[0] = typename[food.num]
+        fridge[0].add_food(food)
 def find_food(foodname):
     if foodname in fruit_list:
         return Food(foodname, fruit_list[0], 0)
@@ -116,6 +150,6 @@ if __name__ == "__main__":
     fridge = [Tank(), Tank(), Tank(), Tank(), Tank(), Tank()]
 
     t1 = threading.Thread(target=fridgeUI)
-    t2 = threading.Thread(target=terminal_simu, args=(fridge,))
+    t2 = threading.Thread(target=logic, args=(fridge,))
     t1.start()
     t2.start()
