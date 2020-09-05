@@ -58,6 +58,7 @@ class GUI():
             self.content[1][i].grid(row=1, column=2)
             self.content[2][i].grid(row=2, column=2)
             self.content[3][i].grid(row=3, column=2)
+
             self.framelist[i].grid(row=i // 3, column=i % 3)
         self.root.after(1000, self.Update)
         self.root.mainloop()
@@ -89,15 +90,47 @@ def image_detect():
 def fridgeUI():
     root = Tk()
     fUI = GUI(root)
+def fetch_w():
+    result_str = ""
+    ser = serial.Serial('/dev/ttyAMA1', 9600)  # 9600为波特率，通信双方要保持一致
+    if ser.isOpen == False:
+        ser.open()  # 打开串口
+    # ser.write(b"Raspberry pi is ready")
+    try:
+        size = ser.inWaiting()  # 获得缓冲区字符
+        if size != 0:
+            response = ser.read(size)  # 读取内容并显示
+            try:
+                result_str = response.decode().strip()
+            except:
+                pass
+            ser.flushInput()  # 清空接收缓存区
+    except KeyboardInterrupt:
+        pass
+    ser.close()
+    return result_str
+    return 10.0
 def logic(fridge):
     global temp, mois, type
-    foodname = image_detect()
-    food = find_food(foodname)
-    if food.attribute == fridge[0].attribute or fridge[0].attribute == 'empty':
-        temp[0] = temperature_reco[food.num]
-        mois[0] = moisture_reco[food.num]
-        type[0] = typename[food.num]
-        fridge[0].add_food(food)
+    w_threshold = 1000.0
+    w_cur = fetch_w()
+    while True:
+        w_pre = w_cur
+        w_cur = fetch_w()
+        if w_cur - w_pre > 2000:
+            foodname = image_detect()
+            food = find_food(foodname)
+            if food.attribute == fridge[0].attribute or fridge[0].attribute == 'empty':
+                temp[0] = temperature_reco[food.num]
+                mois[0] = moisture_reco[food.num]
+                type[0] = typename[food.num]
+                fridge[0].add_food(food)
+        elif w_cur < w_threshold:
+            fridge[0].remove_all()
+            temp[0] = 0
+            mois[0] = 80
+            type[0] = "默认"
+
 def find_food(foodname):
     if foodname in fruit_list:
         return Food(foodname, fruit_list[0], 0)
