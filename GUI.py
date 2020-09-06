@@ -4,11 +4,15 @@ from tank import Tank
 from food import Food
 import serial
 import time
+import tkinter.font as tkFont
 # import RPi.GPIO as GPIO
 
+name = ["保鲜室1", "保鲜室2", "保鲜室3", "保鲜室4", "保鲜室5", "保鲜室6"]
 temp = [0, 0, 0, 0, 0, 0]
 mois = [80, 80, 80, 80, 80, 80]
 type = ["默认", "默认", "默认", "默认", "默认", "默认"]
+info = ["箱体清空，已恢复默认模式！", "箱体清空，已恢复默认模式！", "箱体清空，已恢复默认模式！", "箱体清空，已恢复默认模式！", "箱体清空，已恢复默认模式！", "箱体清空，已恢复默认模式！"]
+colo = ["white", "white", "white", "white", "white", "white"]
 fruit_list = ['fruit', 'apple', 'banana', 'orange', 'peach', 'pear', 'berry', 'pineapple', 'melon', 'radish', 'tomato', 'cucumber', 'pumpkin']
 vegetable_list = ['vegetable', 'mushroom', 'spinach', 'celery', 'caraway', 'lettuce', 'agaric', 'lotus root', 'water shield', 'arrowhead', 'cress']
 meat_list = ['meat', 'beef', 'pork', 'fish', 'egg', 'mutton', 'chicken', 'duck']
@@ -24,9 +28,11 @@ class GUI():
     def Update(self):
         global temp, mois, type
         for i in range(6):
-            self.content[1][i].config(text=type[i])
-            self.content[2][i].config(text=temp[i])
-            self.content[3][i].config(text=mois[i])
+            self.content[2][i].config(text=type[i])
+            self.content[3][i].config(text=temp[i])
+            self.content[4][i].config(text=mois[i])
+            self.content[6][i].config(text=info[i])
+            self.framelist[i].config(bg=colo[i])
         self.root.after(1000, self.Update)
     def initGUI(self, root):
         global temp, mois, type
@@ -34,31 +40,41 @@ class GUI():
         self.root.geometry("1024x600")
         self.root.title("Frodge UI")
         self.framelist = []
-        self.content = [[], [], [], [], []]
+        self.content = [[], [], [], [], [], [], []]
         # init list
         for i in range(6):
             self.framelist.append(Frame())
-            self.content[0].append([Label(), Label(), Label()])  # fix
-            self.content[1].append(Label())  # type
-            self.content[2].append(Label())  # tempture
-            self.content[3].append(Label())  # moisture
-            self.content[4].append([Label(), Label()])  # unit
+            self.content[0].append(Label()) # name
+            self.content[1].append([Label(), Label(), Label()])  # fix
+            self.content[2].append(Label())  # type
+            self.content[3].append(Label())  # tempture
+            self.content[4].append(Label())  # moisture
+            self.content[5].append([Label(), Label()])  # unit
+            self.content[6].append(Label()) # information
         # init frame
         for i in range(6):
-            self.framelist[i] = Frame(self.root, height=300, width=341)
+            self.framelist[i] = Frame(self.root, height=300, width=341, bg=colo[i])
             self.framelist[i].grid_propagate(0)
-            self.content[0][i][0] = Label(self.framelist[i], text="类型：").grid(row=1, column=1)
-            self.content[0][i][1] = Label(self.framelist[i], text="温度：").grid(row=2, column=1)
-            self.content[0][i][2] = Label(self.framelist[i], text="湿度：").grid(row=3, column=1)
-            self.content[1][i] = Label(self.framelist[i], text=type)
-            self.content[2][i] = Label(self.framelist[i], text=temp)
-            self.content[3][i] = Label(self.framelist[i], text=mois)
-            self.content[4][i][0] = Label(self.framelist[i], text="°C").grid(row=2, column=3)
-            self.content[4][i][1] = Label(self.framelist[i], text="%").grid(row=3, column=3)
-            self.content[1][i].grid(row=1, column=2)
-            self.content[2][i].grid(row=2, column=2)
-            self.content[3][i].grid(row=3, column=2)
-
+            self.content[0][i] = Label(self.framelist[i], text=name[i], bg=colo[i], font="Fixdsys 15 bold") # name
+            self.content[1][i][0] = Label(self.framelist[i], text="类型：", bg=colo[i], font="Fixdsys 12") # fixed properties
+            self.content[1][i][1] = Label(self.framelist[i], text="温度：", bg=colo[i], font="Fixdsys 12")
+            self.content[1][i][2] = Label(self.framelist[i], text="湿度：", bg=colo[i], font="Fixdsys 12")
+            self.content[2][i] = Label(self.framelist[i], text=type[i], bg=colo[i],font="Fixdsys 12") # type
+            self.content[3][i] = Label(self.framelist[i], text=temp[i], bg=colo[i],font="Fixdsys 12") # temperature
+            self.content[4][i] = Label(self.framelist[i], text=mois[i], bg=colo[i],font="Fixdsys 12") # moisture
+            self.content[5][i][0] = Label(self.framelist[i], text="°C", bg=colo[i],font="Fixdsys 12") # unit
+            self.content[5][i][1] = Label(self.framelist[i], text="%", bg=colo[i],font="Fixdsys 12")
+            self.content[6][i] = Label(self.framelist[i], text=info[i], bg=colo[i],font="Fixdsys 12") # information: warning, reminding
+            self.content[0][i].grid(row=0, column=1, columnspan=3)
+            self.content[1][i][0].grid(row=1, column=1)
+            self.content[1][i][1].grid(row=2, column=1)
+            self.content[1][i][2].grid(row=3, column=1)
+            self.content[2][i].grid(row=1, column=2)
+            self.content[3][i].grid(row=2, column=2)
+            self.content[4][i].grid(row=3, column=2)
+            self.content[5][i][0].grid(row=2 ,column=3)
+            self.content[5][i][1].grid(row=3, column=3)
+            self.content[6][i].grid(row=4, column=1, columnspan=3, pady = 15)
             self.framelist[i].grid(row=i // 3, column=i % 3)
         self.root.after(1000, self.Update)
         self.root.mainloop()
@@ -97,18 +113,24 @@ def fetch_w():
         ser.open()  # 打开串口
     # ser.write(b"Raspberry pi is ready")
     try:
-        size = ser.inWaiting()  # 获得缓冲区字符
-        if size != 0:
-            response = ser.read(size)  # 读取内容并显示
+        while True:
             try:
-                result_str = response.decode().strip()
+                size = ser.inWaiting()  # 获得缓冲区字符
+                if size != 0:
+                    response = ser.read(size)  # 读取内容并显示
+                    try:
+                        result_str = response.decode().strip()
+                    except:
+                        pass
+                    ser.flushInput()  # 清空接收缓存区
+                result_float = float(result_str)
+                print(result_float)
             except:
                 pass
-            ser.flushInput()  # 清空接收缓存区
     except KeyboardInterrupt:
         pass
     ser.close()
-    return result_str
+    return result_float
     return 10.0
 def logic(fridge):
     global temp, mois, type
@@ -117,7 +139,7 @@ def logic(fridge):
     while True:
         w_pre = w_cur
         w_cur = fetch_w()
-        if w_cur - w_pre > 2000:
+        if w_cur - w_pre > 5000:
             foodname = image_detect()
             food = find_food(foodname)
             if food.attribute == fridge[0].attribute or fridge[0].attribute == 'empty':
@@ -125,11 +147,22 @@ def logic(fridge):
                 mois[0] = moisture_reco[food.num]
                 type[0] = typename[food.num]
                 fridge[0].add_food(food)
+                if foodname not in fridge[0].containing_food_list:
+                    info[0] = "食材{}添加成功！".format(foodname)
+                    colo[0] = "green"
+                time.sleep(2)
+                info[0] = ""
+            else:
+                info[0] = "该食材不应该放置在此箱体！"
+                colo[0] = "red"
         elif w_cur < w_threshold:
             fridge[0].remove_all()
             temp[0] = 0
             mois[0] = 80
             type[0] = "默认"
+            info[0] = "箱体清空，已恢复默认模式！"
+            colo[0] = ""
+
 
 def find_food(foodname):
     if foodname in fruit_list:

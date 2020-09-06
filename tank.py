@@ -23,12 +23,12 @@ class Tank:
                 break
         if len(self.containing_food_list) == 0:
             self.attribute = 'empty'
-            print("箱体已清空，恢复默认模式！")
+            print("箱体清空，已恢复默认模式！")
 
     def remove_all(self):
         self.attribute = 'empty'
         self.containing_food_list = []
-        print("箱体已清空，恢复默认模式！")
+        print("箱体清空，已恢复默认模式！")
 
     def check_empty(self):
         if len(self.containing_food_list) == 0:
